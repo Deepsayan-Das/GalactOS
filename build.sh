@@ -53,8 +53,7 @@ echo "==========INSTALLING KERNEL + BOOTLOADER=========="
 sudo mount --bind /dev /mnt/galactos/dev
 sudo mount --bind /proc /mnt/galactos/proc
 sudo mount --bind /sys /mnt/galactos/sys
-sudo chroot /mnt/galactos /bin/bash -c "apt update && apt install -y linux-image-amd64 grub-pc && grub-install ${LOOPDEV} && update-grub"
-
+sudo chroot /mnt/galactos /bin/bash -c "apt update && apt install -y linux-image-amd64 grub-pc && ln -sf /lib/systemd/systemd /usr/sbin/init && grub-install ${LOOPDEV} && update-grub"
 echo "==========CLEANUP=========="
 sudo umount /mnt/galactos/dev
 sudo umount /mnt/galactos/proc
