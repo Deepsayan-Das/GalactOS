@@ -23,6 +23,10 @@ sudo sed -i 's|^NAME=.*|NAME="GalactOS GNU/Linux"|' rootfs/etc/os-release
 echo 'ID_LIKE=debian' | sudo tee -a rootfs/etc/os-release > /dev/null
 echo "============================================="
 
+echo "==========SETTING LOGIN BANNER=========="
+echo "GalactOS Ignition (beta-v1.0) \n \l" | sudo tee rootfs/etc/issue > /dev/null
+echo "=========================================="
+
 echo "==========CREATING DISK IMAGE=========="
 qemu-img create -f raw galactos.img 2G
 
@@ -43,7 +47,10 @@ LOOPDEV=$(losetup -j galactos.img | cut -d: -f1)
 
 echo "==========FORMATTING PARTITION=========="
 sudo mkfs.ext4 ${LOOPDEV}p1
-
+echo "==========GENERATING FSTAB=========="
+ROOT_UUID=$(sudo blkid -s UUID -o value ${LOOPDEV}p1)
+echo "UUID=${ROOT_UUID}  /  ext4  errors=remount-ro  0  1" | sudo tee rootfs/etc/fstab > /dev/null
+echo "====================================="
 echo "==========MOUNTING AND COPYING ROOTFS=========="
 sudo mkdir -p /mnt/galactos
 sudo mount ${LOOPDEV}p1 /mnt/galactos
@@ -54,6 +61,13 @@ sudo mount --bind /dev /mnt/galactos/dev
 sudo mount --bind /proc /mnt/galactos/proc
 sudo mount --bind /sys /mnt/galactos/sys
 sudo chroot /mnt/galactos /bin/bash -c "apt update && apt install -y linux-image-amd64 grub-pc && ln -sf /lib/systemd/systemd /usr/sbin/init && grub-install ${LOOPDEV} && update-grub"
+
+echo "==========SETTING ROOT PASSWORD=========="
+read -sp "Enter root password for this GalactOS image: " ROOTPASS
+echo
+sudo chroot /mnt/galactos /bin/bash -c "echo 'root:${ROOTPASS}' | chpasswd"
+unset ROOTPASS
+echo "==========================================="
 
 echo "==========CONFIGURING GRUB CONSOLE OUTPUT=========="
 sudo chroot /mnt/galactos /bin/bash -c "
