@@ -61,7 +61,21 @@ sudo mount --bind /dev /mnt/galactos/dev
 sudo mount --bind /proc /mnt/galactos/proc
 sudo mount --bind /sys /mnt/galactos/sys
 sudo chroot /mnt/galactos /bin/bash -c "apt update && apt install -y linux-image-amd64 grub-pc && ln -sf /lib/systemd/systemd /usr/sbin/init && grub-install ${LOOPDEV} && update-grub"
-
+sudo chroot /mnt/galactos /bin/bash -c "apt install -y git curl wget make"
+echo "==========INSTALLING NOVA=========="
+# NOTE: nova is copied in as a pre-built binary, not built from source during
+# this script, to avoid requiring network/Go toolchain inside the chroot.
+# You must build nova separately first: cd ~/dev/nova && go build -o nova .
+NOVA_BINARY_PATH="$HOME/dev/nova/nova"
+if [ -f "$NOVA_BINARY_PATH" ]; then
+    sudo cp "$NOVA_BINARY_PATH" /mnt/galactos/usr/local/bin/nova
+    sudo chmod +x /mnt/galactos/usr/local/bin/nova
+    echo "nova binary installed to /usr/local/bin/nova"
+else
+    echo "WARNING: nova binary not found at $NOVA_BINARY_PATH — skipping nova install"
+    echo "Build it first with: cd ~/dev/nova && go build -o nova ."
+fi
+echo "===================================="
 echo "==========SETTING ROOT PASSWORD=========="
 read -sp "Enter root password for this GalactOS image: " ROOTPASS
 echo
