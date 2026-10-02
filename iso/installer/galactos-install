@@ -1,0 +1,77 @@
+#!/bin/bash
+set -e
+
+echo "=========================================="
+echo " GalactOS Installer"
+echo "=========================================="
+echo
+lsblk
+echo
+read -p "Enter target disk to install to (e.g. sda, NOT /dev/sda): " DISK
+TARGET="/dev/${DISK}"
+
+if [ ! -b "$TARGET" ]; then
+    echo "ERROR: $TARGET is not a valid block device."
+    exit 1
+fi
+
+read -p "This will ERASE ALL DATA on $TARGET. Type 'yes' to continue: " CONFIRM
+if [ "$CONFIRM" != "yes" ]; then
+    echo "Aborted."
+    exit 1
+fi
+
+echo "==========PARTITIONING $TARGET=========="
+fdisk "$TARGET" << EOF
+n
+p
+1
+
+
+a
+w
+EOF
+
+echo "==========FORMATTING=========="
+mkfs.ext4 "${TARGET}1"
+
+echo "==========MOUNTING TARGET=========="
+mkdir -p /mnt/galactos-target
+mount "${TARGET}1" /mnt/galactos-target
+
+echo "==========COPYING LIVE SYSTEM TO DISK=========="
+rsync -aAXv --exclude=/proc --exclude=/sys --exclude=/dev \
+    --exclude=/mnt --exclude=/run --exclude=/tmp \
+    / /mnt/galactos-target/
+echo "rsync exit code: $?"
+
+echo "==========CREATING MISSING MOUNT POINTS=========="
+mkdir -p /mnt/galactos-target/dev /mnt/galactos-target/proc /mnt/galactos-target/sys /mnt/galactos-target/run /mnt/galactos-target/tmp /mnt/galactos-target/mnt
+echo "==========ENSURING KERNEL/INITRD PRESENT=========="
+mkdir -p /mnt/galactos-target/boot
+KVER=$(ls /lib/modules/ | head -n1)
+cp /run/live/medium/boot/vmlinuz "/mnt/galactos-target/boot/vmlinuz-${KVER}"
+cp /run/live/medium/boot/initrd "/mnt/galactos-target/boot/initrd.img-${KVER}"
+ln -sf "boot/vmlinuz-${KVER}" /mnt/galactos-target/vmlinuz
+ln -sf "boot/initrd.img-${KVER}" /mnt/galactos-target/initrd.img
+ls -la /mnt/galactos-target/boot/
+
+echo "==========GENERATING FSTAB=========="
+ROOT_UUID=$(blkid -s UUID -o value "${TARGET}1")
+echo "UUID=${ROOT_UUID}  /  ext4  errors=remount-ro  0  1" > /mnt/galactos-target/etc/fstab
+
+echo "==========INSTALLING BOOTLOADER=========="
+mount --bind /dev /mnt/galactos-target/dev
+mount --bind /proc /mnt/galactos-target/proc
+mount --bind /sys /mnt/galactos-target/sys
+chroot /mnt/galactos-target /bin/bash -c "grub-install ${TARGET} && update-grub"
+
+echo "==========CLEANUP=========="
+umount /mnt/galactos-target/dev
+umount /mnt/galactos-target/proc
+umount /mnt/galactos-target/sys
+umount /mnt/galactos-target
+
+echo "=========================================="
+echo " Install complete. Remove the ISO and reboot."
+echo "=========================================="
