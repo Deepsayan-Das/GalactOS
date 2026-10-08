@@ -1,1 +1,8 @@
+iso/live-rootfs/
+iso/iso/
+*.iso
+*.squashfs
+*.img
+*.raw
+*.deb
 rootfs/

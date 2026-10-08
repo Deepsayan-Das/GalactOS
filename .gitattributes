@@ -1,0 +1,2 @@
+*.sh text eol=lf
+iso/installer/galactos-install text eol=lf
