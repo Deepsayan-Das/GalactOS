@@ -14,6 +14,7 @@ build.sh              # Builds a complete, installed GalactOS disk image (.img)
 iso/
   build-rootfs.sh       # Builds a branded, packaged rootfs (shared by build.sh's
                          # logic and the live ISO)
+  build-gui.sh          # Installs and configures Openbox desktop GUI on a rootfs
   build-iso.sh           # Packages a rootfs into a bootable live ISO
   grub/
     grub.cfg               # Live-boot GRUB configuration
@@ -57,8 +58,8 @@ sudo apt install -y debootstrap xorriso squashfs-tools \
 ```bash
 cd iso
 
-# 1. Build the rootfs (prompts for a root password near the end)
-chmod +x build-rootfs.sh
+# 1. Build the rootfs (installs base packages, Nova, and Openbox GUI environment)
+chmod +x build-rootfs.sh build-gui.sh
 ./build-rootfs.sh live-rootfs
 
 # 2. Add the installer script into the rootfs

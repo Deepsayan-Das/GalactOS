@@ -9,6 +9,8 @@ if [ -z "$ROOTFS_DIR" ]; then
     exit 1
 fi
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 echo "==========SCAFFOLDING FILESYSTEM=========="
 sudo debootstrap --variant=minbase stable "$ROOTFS_DIR" http://deb.debian.org/debian
 
@@ -46,6 +48,9 @@ echo -e "GalactOS Ignition (beta-v1.0) \n \l" | sudo tee "$ROOTFS_DIR/etc/issue"
 
 echo "==========INSTALLING KERNEL + LIVE-BOOT SUPPORT=========="
 sudo chroot "$ROOTFS_DIR" /bin/bash -c "apt install -y linux-image-amd64 live-boot systemd-sysv grub-pc"
+
+echo "==========INSTALLING DESKTOP GUI ENVIRONMENT=========="
+"$SCRIPT_DIR/build-gui.sh" "$ROOTFS_DIR"
 
 echo "==========SETTING ROOT PASSWORD=========="
 read -sp "Enter root password for this GalactOS rootfs: " ROOTPASS
