@@ -59,6 +59,20 @@ sudo cp "$DEB_DIR/$DEB_NAME" "$ROOTFS_DIR/root/$DEB_NAME"
 sudo chroot "$ROOTFS_DIR" apt install -y "/root/$DEB_NAME"
 sudo rm "$ROOTFS_DIR/root/$DEB_NAME"
 
+echo "==========INSTALLING GREETER THEME=========="
+THEME_SRC="$SCRIPT_DIR/gui/greeter-theme"
+THEME_DST="$ROOTFS_DIR/usr/share/web-greeter/themes/galactos"
+[ -f "$THEME_SRC/index.html" ] || { echo "ERROR: greeter theme missing in $THEME_SRC" >&2; exit 1; }
+sudo rm -rf "$THEME_DST"
+sudo mkdir -p "$THEME_DST"
+sudo cp -r "$THEME_SRC/." "$THEME_DST/"
+sudo chmod -R a+rX "$THEME_DST"
+sudo sed -i 's/^theme = .*/theme = "galactos"/' "$ROOTFS_DIR/etc/lightdm/web-greeter.toml"
+
+echo "==========ENABLING WEB-GREETER=========="
+sudo mkdir -p "$ROOTFS_DIR/etc/lightdm/lightdm.conf.d"
+printf '[Seat:*]\ngreeter-session=web-greeter\n' | sudo tee "$ROOTFS_DIR/etc/lightdm/lightdm.conf.d/60-web-greeter.conf" > /dev/null
+
 echo "==========CONFIGURING OPENBOX THEME=========="
 sudo cp "$ROOTFS_DIR/etc/xdg/openbox/rc.xml" "$ROOTFS_DIR/root/.config/openbox/rc.xml"
 sudo sed -i '/<theme>/{n;s|<name>[^<]*</name>|<name>GalactOS-Dark</name>|}' "$ROOTFS_DIR/root/.config/openbox/rc.xml"
