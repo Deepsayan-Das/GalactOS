@@ -1,0 +1,16 @@
+* {
+    bg: #2c3542;
+    card: #3a4556;
+    fg: #EDE9F3;
+    accent: #DCCCEC;
+    dim: #8f95a3;
+    font: "JetBrains Mono 11";
+    background-color: transparent;
+    text-color: @fg;
+}
+window { width: 480px; location: center; background-color: @bg; border: 0; border-radius: 0; }
+mainbox { padding: 12px; }
+inputbar { padding: 8px 12px; background-color: @card; }
+listview { lines: 8; margin: 8px 0 0 0; scrollbar: false; }
+element { padding: 8px 12px; }
+element selected { background-color: @card; text-color: @accent; }

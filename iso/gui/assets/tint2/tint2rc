@@ -1,0 +1,48 @@
+# 1: panel
+rounded = 0
+border_width = 0
+background_color = #3a4556 100
+border_color = #3a4556 0
+
+# 2: normal task
+rounded = 0
+border_width = 0
+background_color = #3a4556 0
+border_color = #3a4556 0
+
+# 3: active task
+rounded = 0
+border_width = 0
+background_color = #DCCCEC 25
+border_color = #DCCCEC 0
+
+panel_items = LT
+panel_size = 100% 36
+panel_margin = 0 0
+panel_padding = 10 4 10
+panel_background_id = 1
+panel_position = bottom center horizontal
+panel_layer = top
+strut_policy = follow_size
+autohide = 0
+
+launcher_padding = 6 2 6
+launcher_background_id = 0
+launcher_icon_size = 24
+launcher_icon_theme = Papirus-Dark
+launcher_icon_asb = 100 0 0
+launcher_item_app = /usr/share/applications/firefox-esr.desktop
+launcher_item_app = /usr/share/applications/pcmanfm.desktop
+launcher_item_app = /usr/share/applications/Alacritty.desktop
+
+taskbar_mode = single_desktop
+taskbar_padding = 6 0 6
+taskbar_background_id = 0
+task_text = 0
+task_icon = 1
+task_centered = 1
+task_maximum_size = 48 40
+task_padding = 8 4 8
+task_icon_asb = 100 0 0
+task_background_id = 2
+task_active_background_id = 3

@@ -57,6 +57,17 @@ sudo cp "$ASSETS_DIR/themerc" "$ROOTFS_DIR/usr/share/themes/GalactOS-Dark/openbo
 sudo mkdir -p "$ROOTFS_DIR/etc/lightdm"
 sudo cp "$ASSETS_DIR/lightdm-gtk-greeter.conf" "$ROOTFS_DIR/etc/lightdm/lightdm-gtk-greeter.conf"
 
+sudo mkdir -p "$ROOTFS_DIR/root/.config/polybar"
+sudo cp "$ASSETS_DIR/polybar/config.ini" "$ROOTFS_DIR/root/.config/polybar/config.ini"
+
+mkdir -p gui/assets/gtk-3.0
+printf '[Settings]\ngtk-theme-name=Arc-Dark\ngtk-icon-theme-name=Papirus-Dark\n' > gui/assets/gtk-3.0/settings.ini
+
+sudo mkdir -p "$ROOTFS_DIR/root/.config/rofi" "$ROOTFS_DIR/root/.config/tint2" "$ROOTFS_DIR/root/.local/share/applications"
+sudo cp "$ASSETS_DIR/rofi/config.rasi" "$ASSETS_DIR/rofi/galactos.rasi" "$ROOTFS_DIR/root/.config/rofi/"
+sudo cp "$ASSETS_DIR/tint2/tint2rc" "$ROOTFS_DIR/root/.config/tint2/tint2rc"
+sudo cp "$ASSETS_DIR/applications/"*.desktop "$ROOTFS_DIR/root/.local/share/applications/"
+
 echo "==========INSTALLING WEB-GREETER=========="
 DEB_NAME="web-greeter-4.0.0-debian.deb"
 DEB_DIR="$SCRIPT_DIR/gui/debs"
