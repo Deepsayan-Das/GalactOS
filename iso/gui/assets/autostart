@@ -1,1 +1,4 @@
 feh --bg-fill /usr/share/backgrounds/galactos.jpg &
+
+tint2 &
+plank &

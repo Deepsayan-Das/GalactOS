@@ -30,7 +30,16 @@ sudo chroot "$ROOTFS_DIR" /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt updat
     feh \
     lightdm\
     libpython3.13 desktop-file-utils libnss3 libasound2t64 \
-libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxcb-xkb1 libxkbcommon-x11-0"
+libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxcb-xkb1 libxkbcommon-x11-0 \
+network-manager \
+pcmanfm \
+firefox-esr \
+tint2 \
+plank \
+arc-theme \
+papirus-icon-theme"
+
+cat gui/assets/autostart
 
 echo "==========COPYING GUI ASSETS=========="
 sudo mkdir -p "$ROOTFS_DIR/root/.config/picom"
