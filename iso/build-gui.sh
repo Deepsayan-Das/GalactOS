@@ -28,7 +28,7 @@ sudo chroot "$ROOTFS_DIR" /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt updat
     python3-xdg \
     picom \
     feh \
-    lightdm\
+    lightdm \
     libpython3.13 desktop-file-utils libnss3 libasound2t64 \
 libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxcb-xkb1 libxkbcommon-x11-0 \
 network-manager \
@@ -37,9 +37,9 @@ firefox-esr \
 tint2 \
 plank \
 arc-theme \
-papirus-icon-theme"
+papirus-icon-theme \
+polybar rofi alacritty fonts-jetbrains-mono fonts-font-awesome fonts-inter alsa-utils"
 
-cat gui/assets/autostart
 
 echo "==========COPYING GUI ASSETS=========="
 sudo mkdir -p "$ROOTFS_DIR/root/.config/picom"
@@ -59,14 +59,21 @@ sudo cp "$ASSETS_DIR/lightdm-gtk-greeter.conf" "$ROOTFS_DIR/etc/lightdm/lightdm-
 
 sudo mkdir -p "$ROOTFS_DIR/root/.config/polybar"
 sudo cp "$ASSETS_DIR/polybar/config.ini" "$ROOTFS_DIR/root/.config/polybar/config.ini"
+sudo mkdir -p "$ROOTFS_DIR/root/.config/gtk-3.0"
+sudo cp "$ASSETS_DIR/gtk-3.0/settings.ini" "$ROOTFS_DIR/root/.config/gtk-3.0/settings.ini"
 
-mkdir -p gui/assets/gtk-3.0
-printf '[Settings]\ngtk-theme-name=Arc-Dark\ngtk-icon-theme-name=Papirus-Dark\n' > gui/assets/gtk-3.0/settings.ini
 
 sudo mkdir -p "$ROOTFS_DIR/root/.config/rofi" "$ROOTFS_DIR/root/.config/tint2" "$ROOTFS_DIR/root/.local/share/applications"
 sudo cp "$ASSETS_DIR/rofi/config.rasi" "$ASSETS_DIR/rofi/galactos.rasi" "$ROOTFS_DIR/root/.config/rofi/"
 sudo cp "$ASSETS_DIR/tint2/tint2rc" "$ROOTFS_DIR/root/.config/tint2/tint2rc"
 sudo cp "$ASSETS_DIR/applications/"*.desktop "$ROOTFS_DIR/root/.local/share/applications/"
+
+sudo cp "$ASSETS_DIR/menu.xml" "$ROOTFS_DIR/root/.config/openbox/menu.xml"
+sudo mkdir -p "$ROOTFS_DIR/root/.config/alacritty"
+sudo cp "$ASSETS_DIR/alacritty/alacritty.toml" "$ROOTFS_DIR/root/.config/alacritty/alacritty.toml"
+
+sudo mkdir -p "$ROOTFS_DIR/root/.config/autostart"
+sudo cp "$ASSETS_DIR/autostart-override/picom.desktop" "$ROOTFS_DIR/root/.config/autostart/picom.desktop"
 
 echo "==========INSTALLING WEB-GREETER=========="
 DEB_NAME="web-greeter-4.0.0-debian.deb"
@@ -96,6 +103,7 @@ printf '[Seat:*]\ngreeter-session=web-greeter\n' | sudo tee "$ROOTFS_DIR/etc/lig
 echo "==========CONFIGURING OPENBOX THEME=========="
 sudo cp "$ROOTFS_DIR/etc/xdg/openbox/rc.xml" "$ROOTFS_DIR/root/.config/openbox/rc.xml"
 sudo sed -i '/<theme>/{n;s|<name>[^<]*</name>|<name>GalactOS-Dark</name>|}' "$ROOTFS_DIR/root/.config/openbox/rc.xml"
+sudo sed -i '/<font place="MenuItem">/,/<\/font>/{s|<name>[^<]*</name>|<name>JetBrains Mono</name>|;s|<size>[^<]*</size>|<size>10</size>|}' "$ROOTFS_DIR/root/.config/openbox/rc.xml"
 
 if ! sudo grep -A2 "<theme>" "$ROOTFS_DIR/root/.config/openbox/rc.xml" | grep -q "GalactOS-Dark"; then
     echo "ERROR: GalactOS-Dark theme missing in $ROOTFS_DIR/root/.config/openbox/rc.xml" >&2

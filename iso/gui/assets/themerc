@@ -8,5 +8,24 @@ window.active.label.text.color: #e0e0e0
 window.inactive.label.text.color: #6e6e72
 border.width: 1
 window.handle.width: 0
-padding.width: 2
+padding.width: 14
 font: shadow=n
+menu.border.width: 8
+menu.border.color: #2c3542
+menu.overlap: 0
+menu.items.bg: flat solid
+menu.items.bg.color: #2c3542
+menu.items.text.color: #EDE9F3
+menu.items.disabled.text.color: #8f95a3
+menu.items.active.bg: flat solid
+menu.items.active.bg.color: #3a4556
+menu.items.active.text.color: #DCCCEC
+menu.title.bg: flat solid
+menu.title.bg.color: #2c3542
+menu.title.text.color: #DCCCEC
+menu.separator.color: #4a5568
+menu.separator.width: 1
+menu.separator.padding.width: 6
+menu.separator.padding.height: 6
+padding.width: 14
+padding.height: 8

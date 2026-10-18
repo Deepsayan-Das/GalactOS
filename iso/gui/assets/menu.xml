@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openbox_menu xmlns="http://openbox.org/3.4/menu">
+<menu id="root-menu" label="">
+  <item label="Terminal"><action name="Execute"><command>alacritty</command></action></item>
+  <item label="Files"><action name="Execute"><command>pcmanfm</command></action></item>
+  <item label="Browser"><action name="Execute"><command>firefox-esr</command></action></item>
+  <separator/>
+  <item label="All apps"><action name="Execute"><command>rofi -show drun</command></action></item>
+  <item label="Refresh desktop"><action name="Reconfigure"/></item>
+  <separator/>
+  <menu id="power-menu" label="Power">
+    <item label="Restart"><action name="Execute"><command>systemctl reboot</command></action></item>
+    <item label="Shut down"><action name="Execute"><command>systemctl poweroff</command></action></item>
+    <item label="Log out"><action name="Exit"/></item>
+  </menu>
+</menu>
+</openbox_menu>
