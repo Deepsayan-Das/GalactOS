@@ -1,13 +1,4 @@
-window.active.border.color: #2a2a2e
-window.inactive.border.color: #1a1a1c
-window.active.title.bg: flat solid
-window.active.title.bg.color: #1e1e21
-window.inactive.title.bg: flat solid
-window.inactive.title.bg.color: #141416
-window.active.label.text.color: #e0e0e0
-window.inactive.label.text.color: #6e6e72
 border.width: 1
-window.handle.width: 0
 padding.width: 14
 font: shadow=n
 menu.border.width: 8
@@ -29,3 +20,51 @@ menu.separator.padding.width: 6
 menu.separator.padding.height: 6
 padding.width: 14
 padding.height: 8
+
+window.client.padding.width: 0
+window.client.padding.height: 0
+window.handle.width: 0
+window.active.client.color: #2c3542
+window.inactive.client.color: #2c3542
+window.active.border.color: #2c3542
+window.inactive.border.color: #2c3542
+
+window.active.title.bg: flat solid
+window.active.title.bg.color: #3a4556
+window.active.label.bg: parentrelative
+window.active.label.text.color: #EDE9F3
+window.active.button.unpressed.image.color: #EDE9F3
+window.active.button.pressed.image.color: #DCCCEC
+window.active.button.hover.image.color: #DCCCEC
+
+window.inactive.title.bg: flat solid
+window.inactive.title.bg.color: #2c3542
+window.inactive.label.bg: parentrelative
+window.inactive.label.text.color: #8f95a3
+window.inactive.button.unpressed.image.color: #8f95a3
+window.inactive.button.pressed.image.color: #DCCCEC
+window.inactive.button.hover.image.color: #DCCCEC
+
+window.active.button.unpressed.bg: parentrelative
+window.active.button.disabled.bg: parentrelative
+window.active.button.hover.bg: flat solid
+window.active.button.hover.bg.color: #4a5568
+window.active.button.pressed.bg: flat solid
+window.active.button.pressed.bg.color: #2c3542
+window.active.button.toggled.unpressed.bg: parentrelative
+window.active.button.toggled.hover.bg: flat solid
+window.active.button.toggled.hover.bg.color: #4a5568
+window.active.button.toggled.pressed.bg: flat solid
+window.active.button.toggled.pressed.bg.color: #2c3542
+
+window.inactive.button.unpressed.bg: parentrelative
+window.inactive.button.disabled.bg: parentrelative
+window.inactive.button.hover.bg: flat solid
+window.inactive.button.hover.bg.color: #4a5568
+window.inactive.button.pressed.bg: flat solid
+window.inactive.button.pressed.bg.color: #2c3542
+window.inactive.button.toggled.unpressed.bg: parentrelative
+window.inactive.button.toggled.hover.bg: flat solid
+window.inactive.button.toggled.hover.bg.color: #4a5568
+window.inactive.button.toggled.pressed.bg: flat solid
+window.inactive.button.toggled.pressed.bg.color: #2c3542

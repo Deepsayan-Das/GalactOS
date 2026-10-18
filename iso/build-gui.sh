@@ -53,6 +53,7 @@ sudo cp "$ASSETS_DIR/galactos.jpg" "$ROOTFS_DIR/usr/share/backgrounds/galactos.j
 
 sudo mkdir -p "$ROOTFS_DIR/usr/share/themes/GalactOS-Dark/openbox-3"
 sudo cp "$ASSETS_DIR/themerc" "$ROOTFS_DIR/usr/share/themes/GalactOS-Dark/openbox-3/themerc"
+sudo cp "$ASSETS_DIR/xbm/"*.xbm "$ROOTFS_DIR/usr/share/themes/GalactOS-Dark/openbox-3/"
 
 sudo mkdir -p "$ROOTFS_DIR/etc/lightdm"
 sudo cp "$ASSETS_DIR/lightdm-gtk-greeter.conf" "$ROOTFS_DIR/etc/lightdm/lightdm-gtk-greeter.conf"
