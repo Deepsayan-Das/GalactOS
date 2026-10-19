@@ -5,7 +5,7 @@
   <item label="Files"><action name="Execute"><command>pcmanfm</command></action></item>
   <item label="Browser"><action name="Execute"><command>firefox-esr</command></action></item>
   <separator/>
-  <item label="All apps"><action name="Execute"><command>rofi -show drun</command></action></item>
+  <item label="All apps"><action name="Execute"><command>rofi -show drun -theme /root/.config/rofi/launcher.rasi</command></action></item>
   <item label="Refresh desktop"><action name="Reconfigure"/></item>
   <separator/>
   <menu id="power-menu" label="Power">

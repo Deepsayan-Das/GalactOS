@@ -66,6 +66,8 @@ sudo cp "$ASSETS_DIR/gtk-3.0/settings.ini" "$ROOTFS_DIR/root/.config/gtk-3.0/set
 
 sudo mkdir -p "$ROOTFS_DIR/root/.config/rofi" "$ROOTFS_DIR/root/.config/tint2" "$ROOTFS_DIR/root/.local/share/applications"
 sudo cp "$ASSETS_DIR/rofi/config.rasi" "$ASSETS_DIR/rofi/galactos.rasi" "$ROOTFS_DIR/root/.config/rofi/"
+sudo cp "$ASSETS_DIR/rofi/sidebar.sh" "$ASSETS_DIR/rofi/sidebar.rasi" "$ASSETS_DIR/rofi/launcher.rasi" "$ROOTFS_DIR/root/.config/rofi/"
+sudo chmod +x "$ROOTFS_DIR/root/.config/rofi/sidebar.sh"
 sudo cp "$ASSETS_DIR/tint2/tint2rc" "$ROOTFS_DIR/root/.config/tint2/tint2rc"
 sudo cp "$ASSETS_DIR/applications/"*.desktop "$ROOTFS_DIR/root/.local/share/applications/"
 

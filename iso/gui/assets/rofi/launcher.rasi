@@ -1,0 +1,11 @@
+@import "/root/.config/rofi/galactos.rasi"
+
+window { fullscreen: true; background-color: #2c3542ee; border: 0; padding: 60px 12%; }
+mainbox { children: [ inputbar, listview ]; spacing: 50px; padding: 0; }
+inputbar { padding: 14px 20px; margin: 0 200px; background-color: @card; children: [ entry ]; }
+entry { placeholder: "Search apps"; placeholder-color: @dim; }
+listview { columns: 6; lines: 4; flow: horizontal; fixed-columns: true; spacing: 20px; scrollbar: false; }
+element { orientation: vertical; padding: 18px; spacing: 10px; }
+element-icon { size: 64px; }
+element-text { horizontal-align: 0.5; }
+element selected { background-color: @card; text-color: @accent; }
