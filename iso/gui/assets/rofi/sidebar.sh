@@ -9,6 +9,7 @@ Volume  ${vol:-n/a}
 Terminal
 Files
 Browser
+Orbit
 Restart
 Shut down
 Log out"
@@ -17,6 +18,7 @@ case "$choice" in
   Terminal) alacritty & ;;
   Files) pcmanfm & ;;
   Browser) firefox-esr & ;;
+  Orbit) alacritty -e orbit-launch & ;;
   Restart) systemctl reboot ;;
   "Shut down") systemctl poweroff ;;
   "Log out") openbox --exit ;;

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Orbit
+Comment=AI coding assistant
+Exec=alacritty -e orbit-launch
+Icon=orbit
+Terminal=false
+Categories=Development;

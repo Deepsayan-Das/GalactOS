@@ -1,0 +1,5 @@
+#!/bin/sh
+[ -f "$HOME/.orbit/config.yaml" ] || orbit-configure
+echo "Orbit works inside a project folder."
+echo "cd into one, then run: orbit"
+exec "${SHELL:-/bin/sh}"

@@ -72,6 +72,8 @@ sudo cp "$ASSETS_DIR/tint2/tint2rc" "$ROOTFS_DIR/root/.config/tint2/tint2rc"
 sudo cp "$ASSETS_DIR/applications/"*.desktop "$ROOTFS_DIR/root/.local/share/applications/"
 
 sudo cp "$ASSETS_DIR/menu.xml" "$ROOTFS_DIR/root/.config/openbox/menu.xml"
+sudo cp "$ASSETS_DIR/orbit/orbit.desktop" "$ROOTFS_DIR/usr/share/applications/orbit.desktop"
+sudo install -m 0755 "$ASSETS_DIR/orbit/orbit-launch" "$ROOTFS_DIR/usr/local/bin/orbit-launch"
 sudo mkdir -p "$ROOTFS_DIR/root/.config/alacritty"
 sudo cp "$ASSETS_DIR/alacritty/alacritty.toml" "$ROOTFS_DIR/root/.config/alacritty/alacritty.toml"
 

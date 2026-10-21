@@ -20,7 +20,7 @@ sudo cp /etc/resolv.conf "$ROOTFS_DIR/etc/resolv.conf"
 echo "==========INSTALLING UNIVERSAL BASELINE PACKAGES=========="
 sudo chroot "$ROOTFS_DIR" /bin/bash -c "apt update && apt install -y \
     git curl wget \
-    vim nano \
+    vim \
     make build-essential \
     sudo \
     ssh \
@@ -35,7 +35,7 @@ sudo chroot "$ROOTFS_DIR" /bin/bash -c "
   mkdir -p /etc/apt/keyrings
   curl -fsSL https://deepsayan-das.github.io/nova/KEY.gpg | gpg --dearmor -o /etc/apt/keyrings/galactos.gpg
   echo 'deb [signed-by=/etc/apt/keyrings/galactos.gpg] https://deepsayan-das.github.io/nova stable main' > /etc/apt/sources.list.d/galactos.list
-  apt update && apt install -y nova
+  apt update && apt install -y nova orbit
 "
 
 echo "==========CONFIGURING OS_RELEASE=========="
