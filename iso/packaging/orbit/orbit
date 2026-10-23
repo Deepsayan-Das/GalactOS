@@ -8,4 +8,7 @@ if [ "$target" = "$HOME" ] || [ "$target" = "/" ]; then
   echo "orbit: refusing to index $target. Run it inside a project folder, or pass one: orbit ./myproject" >&2
   exit 1
 fi
-exec /opt/orbit/venv/bin/python /opt/orbit/repl.py "$@"
+[ -d "$target" ] || { echo "orbit: $1 is not a folder" >&2; exit 1; }
+shift
+cd "$target" || exit 1
+exec /opt/orbit/venv/bin/python /opt/orbit/repl.py . "$@"
