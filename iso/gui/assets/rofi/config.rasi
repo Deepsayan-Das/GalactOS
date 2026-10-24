@@ -5,4 +5,4 @@ configuration {
     drun-display-format: "{name}";
     display-drun: "";
 }
-@theme "/root/.config/rofi/galactos.rasi"
+@theme "/usr/share/galactos/rofi/galactos.rasi"

@@ -34,6 +34,7 @@ launcher_icon_asb = 100 0 0
 launcher_item_app = /usr/share/applications/firefox-esr.desktop
 launcher_item_app = /usr/share/applications/pcmanfm.desktop
 launcher_item_app = /usr/share/applications/Alacritty.desktop
+launcher_item_app = /usr/share/galactos/tint2/allapps.desktop
 
 taskbar_mode = single_desktop
 taskbar_padding = 6 0 6

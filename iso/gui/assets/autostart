@@ -1,5 +1,7 @@
 feh --bg-fill /usr/share/backgrounds/galactos.jpg &
 
-picom --config /root/.config/picom/picom.conf -b
+picom --config /usr/share/galactos/picom/picom.conf -b
 polybar main &
 tint2 &
+lxpolkit &
+dunst &

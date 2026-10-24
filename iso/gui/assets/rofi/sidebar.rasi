@@ -1,4 +1,4 @@
-@import "/root/.config/rofi/galactos.rasi"
+@import "/usr/share/galactos/rofi/galactos.rasi"
 window { location: east; anchor: east; width: 340px; height: 100%; }
 inputbar { enabled: false; }
 listview { lines: 14; margin: 0; }

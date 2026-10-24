@@ -13,7 +13,7 @@ Orbit
 Restart
 Shut down
 Log out"
-choice=$(printf '%s\n' "$rows" | rofi -dmenu -i -no-custom -p "" -theme /root/.config/rofi/sidebar.rasi)
+choice=$(printf '%s\n' "$rows" | rofi -dmenu -i -no-custom -p "" -theme /usr/share/galactos/rofi/sidebar.rasi)
 case "$choice" in
   Terminal) alacritty & ;;
   Files) pcmanfm & ;;

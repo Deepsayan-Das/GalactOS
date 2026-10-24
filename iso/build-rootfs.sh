@@ -51,6 +51,7 @@ sudo chroot "$ROOTFS_DIR" /bin/bash -c "apt install -y linux-image-amd64 live-bo
 
 echo "==========INSTALLING DESKTOP GUI ENVIRONMENT=========="
 "$SCRIPT_DIR/build-gui.sh" "$ROOTFS_DIR"
+"$SCRIPT_DIR/build-system.sh" "$ROOTFS_DIR"
 
 echo "==========SETTING ROOT PASSWORD=========="
 read -sp "Enter root password for this GalactOS rootfs: " ROOTPASS

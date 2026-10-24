@@ -1,0 +1,5 @@
+[Default Applications]
+text/plain=org.gnome.gedit.desktop
+text/markdown=org.gnome.gedit.desktop
+text/x-python=org.gnome.gedit.desktop
+application/x-shellscript=org.gnome.gedit.desktop

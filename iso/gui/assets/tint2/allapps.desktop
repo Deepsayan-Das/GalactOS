@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=All apps
+Exec=rofi -show drun -theme /usr/share/galactos/rofi/launcher.rasi
+Icon=galactos-apps
+Terminal=false

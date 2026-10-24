@@ -1,4 +1,5 @@
 [window]
+title = "Terminal"
 padding = { x = 14, y = 12 }
 opacity = 1.0
 
