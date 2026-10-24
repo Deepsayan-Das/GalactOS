@@ -1,0 +1,3 @@
+[org.gnome.gedit.preferences.editor]
+scheme='oblivion'
+highlight-current-line=false

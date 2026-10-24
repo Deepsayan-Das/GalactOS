@@ -37,6 +37,10 @@ sudo mkdir -p "$ROOTFS/usr/share/icons/hicolor/scalable/apps"
 sudo cp "$ASSETS"/icons/*.svg "$ROOTFS/usr/share/icons/hicolor/scalable/apps/"
 sudo chroot "$ROOTFS" /bin/bash -c "gtk-update-icon-cache -f /usr/share/icons/hicolor 2>/dev/null || true"
 
+echo "==========GSETTINGS DEFAULTS=========="
+sudo cp "$ASSETS/90_galactos.gschema.override" "$ROOTFS/usr/share/glib-2.0/schemas/"
+sudo chroot "$ROOTFS" glib-compile-schemas /usr/share/glib-2.0/schemas
+
 echo "==========/etc/skel (settings for every new user)=========="
 sudo mkdir -p "$ROOTFS/etc/skel/.config" "$ROOTFS/etc/skel/.local/share"
 sudo cp -a "$ROOTFS/root/.config/." "$ROOTFS/etc/skel/.config/"
