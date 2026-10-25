@@ -41,6 +41,10 @@ echo "==========GSETTINGS DEFAULTS=========="
 sudo cp "$ASSETS/90_galactos.gschema.override" "$ROOTFS/usr/share/glib-2.0/schemas/"
 sudo chroot "$ROOTFS" glib-compile-schemas /usr/share/glib-2.0/schemas
 
+
+echo "==========KEYBINDINGS=========="
+sudo sh "$ASSETS/insert-keybinds.sh" "$ROOTFS/root/.config/openbox/rc.xml"
+
 echo "==========/etc/skel (settings for every new user)=========="
 sudo mkdir -p "$ROOTFS/etc/skel/.config" "$ROOTFS/etc/skel/.local/share"
 sudo cp -a "$ROOTFS/root/.config/." "$ROOTFS/etc/skel/.config/"
@@ -52,6 +56,11 @@ fi
 echo "==========LIVE USER (galactos / galactos)=========="
 sudo chroot "$ROOTFS" /bin/bash -c "id galactos >/dev/null 2>&1 || useradd -m -s /bin/bash -G sudo,audio,video galactos"
 echo 'galactos:galactos' | sudo chroot "$ROOTFS" chpasswd
+sudo rm -rf "$ROOTFS/home/galactos/.config" "$ROOTFS/home/galactos/.local/share/applications"
+sudo mkdir -p "$ROOTFS/home/galactos/.local/share"
+sudo cp -a "$ROOTFS/etc/skel/.config" "$ROOTFS/home/galactos/.config"
+sudo cp -a "$ROOTFS/etc/skel/.local/share/applications" "$ROOTFS/home/galactos/.local/share/applications"
+sudo chroot "$ROOTFS" chown -R galactos:galactos /home/galactos
 
 echo "==========CLEANING APT CACHE=========="
 sudo chroot "$ROOTFS" /bin/bash -c "apt clean && rm -rf /var/lib/apt/lists/*"
