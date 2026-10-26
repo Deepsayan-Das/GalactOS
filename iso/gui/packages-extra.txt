@@ -56,3 +56,9 @@ ristretto
 xarchiver
 galculator
 mpv
+grub-pc-bin
+grub-efi-amd64-bin
+grub2-common
+dosfstools
+gdisk
+efibootmgr

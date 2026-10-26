@@ -13,6 +13,7 @@ die() { echo "ERROR: $1" >&2; exit 1; }
 echo "==========DNS FOR CHROOT=========="
 sudo cp /etc/resolv.conf "$ROOTFS/etc/resolv.conf"
 
+sudo chroot "$ROOTFS" /bin/bash -c "dpkg -s grub-pc >/dev/null 2>&1 && DEBIAN_FRONTEND=noninteractive apt-get remove --purge -y grub-pc || true"
 echo "==========INSTALLING EXTRA PACKAGES=========="
 mapfile -t PKGS < <(grep -v '^[[:space:]]*#' "$LIST" | grep -v '^[[:space:]]*$')
 [ "${#PKGS[@]}" -gt 0 ] || die "no packages listed in $LIST"

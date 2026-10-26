@@ -1,77 +1,181 @@
 #!/bin/bash
-set -e
+# GalactOS installer v2: whole-disk install, BIOS + UEFI, real user account.
+set -euo pipefail
+
+[ "$(id -u)" -eq 0 ] || exec sudo "$0" "$@"
+
+T=/mnt/galactos-target
+die() { echo "ERROR: $1" >&2; exit 1; }
+say() { echo; echo "========== $1 =========="; }
+cleanup() { cd /; umount -R "$T" 2>/dev/null || true; }
+trap cleanup EXIT
+trap 'echo "ERROR: installer stopped at line $LINENO" >&2' ERR
 
 echo "=========================================="
 echo " GalactOS Installer"
 echo "=========================================="
-echo
-lsblk
-echo
-read -p "Enter target disk to install to (e.g. sda, NOT /dev/sda): " DISK
-TARGET="/dev/${DISK}"
 
-if [ ! -b "$TARGET" ]; then
-    echo "ERROR: $TARGET is not a valid block device."
-    exit 1
+[ -d /run/live/medium ] || die "run this from the GalactOS live ISO"
+for c in sgdisk mkfs.fat mkfs.ext4 rsync wipefs lsblk blkid grub-install; do
+    command -v "$c" >/dev/null || die "missing tool: $c"
+done
+if [ -d /sys/firmware/efi ]; then echo "Firmware: UEFI"; else echo "Firmware: BIOS"; fi
+echo "The installed system will boot on both BIOS and UEFI machines."
+echo
+
+# ---- choose the disk ----
+LIVE_SRC=$(findmnt -no SOURCE /run/live/medium 2>/dev/null || true)
+LIVE_DISK=""
+if [ -n "$LIVE_SRC" ]; then
+    LIVE_DISK=$(lsblk -no PKNAME "$LIVE_SRC" 2>/dev/null | head -n1 || true)
+fi
+DISKS=()
+while read -r d; do
+    case "$d" in /dev/zram*) continue ;; esac
+    if [ -n "$LIVE_DISK" ] && [ "$d" = "/dev/$LIVE_DISK" ]; then continue; fi
+    DISKS+=("$d")
+done < <(lsblk -dpno NAME,TYPE | awk '$2=="disk"{print $1}')
+[ "${#DISKS[@]}" -gt 0 ] || die "no disk found to install to"
+
+echo "Available disks:"
+i=1
+for d in "${DISKS[@]}"; do
+    printf '  %d) %s   %s   %s\n' "$i" "$d" "$(lsblk -dno SIZE "$d")" "$(lsblk -dno MODEL "$d" | xargs)"
+    i=$((i + 1))
+done
+read -rp "Install to which disk? [1-${#DISKS[@]}]: " N
+if ! [[ "$N" =~ ^[0-9]+$ ]] || [ "$N" -lt 1 ] || [ "$N" -gt "${#DISKS[@]}" ]; then die "invalid choice"; fi
+TARGET="${DISKS[$((N - 1))]}"
+
+SIZE_B=$(blockdev --getsize64 "$TARGET")
+[ "$SIZE_B" -ge 12000000000 ] || die "$TARGET is too small (need at least 12 GB)"
+if [ -n "$(lsblk -nrpo MOUNTPOINT "$TARGET" | tr -d '[:space:]')" ]; then
+    die "$TARGET is in use (mounted). Unmount it first."
 fi
 
-read -p "This will ERASE ALL DATA on $TARGET. Type 'yes' to continue: " CONFIRM
-if [ "$CONFIRM" != "yes" ]; then
-    echo "Aborted."
-    exit 1
+echo
+lsblk "$TARGET"
+echo
+echo "ALL DATA ON $TARGET WILL BE ERASED."
+read -rp "Type the disk name ($(basename "$TARGET")) to confirm: " C
+[ "$C" = "$(basename "$TARGET")" ] || die "aborted, nothing was changed"
+
+# ---- who is this computer for ----
+echo
+while true; do
+    read -rp "Computer name [galactos]: " NEWHOST
+    NEWHOST="${NEWHOST:-galactos}"
+    [[ "$NEWHOST" =~ ^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$ ]] && break
+    echo "Use lowercase letters, digits and hyphens only."
+done
+while true; do
+    read -rp "Username: " NEWUSER
+    if [[ "$NEWUSER" =~ ^[a-z_][a-z0-9_-]{0,30}$ ]] && [ "$NEWUSER" != "root" ]; then break; fi
+    echo "Use lowercase letters, digits, - or _, starting with a letter."
+done
+while true; do
+    read -rsp "Password: " PASS1; echo
+    read -rsp "Repeat password: " PASS2; echo
+    if [ -n "$PASS1" ] && [ "$PASS1" = "$PASS2" ]; then break; fi
+    echo "Passwords are empty or do not match. Try again."
+done
+
+# ---- partition (GPT: BIOS boot + EFI + system) ----
+if [[ "$TARGET" =~ [0-9]$ ]]; then PFX="${TARGET}p"; else PFX="$TARGET"; fi
+ESP="${PFX}2"; ROOTP="${PFX}3"
+
+say "PARTITIONING $TARGET"
+wipefs -af "$TARGET" >/dev/null
+sgdisk --zap-all "$TARGET" >/dev/null
+sgdisk -n1:0:+1M   -t1:ef02 -c1:biosboot "$TARGET" >/dev/null
+sgdisk -n2:0:+512M -t2:ef00 -c2:EFI      "$TARGET" >/dev/null
+sgdisk -n3:0:0     -t3:8300 -c3:GalactOS "$TARGET" >/dev/null
+blockdev --rereadpt "$TARGET" 2>/dev/null || true
+udevadm settle
+for i in 1 2 3 4 5 6 7 8 9 10; do
+    if [ -b "$ROOTP" ] && [ -b "$ESP" ]; then break; fi
+    sleep 1
+done
+{ [ -b "$ROOTP" ] && [ -b "$ESP" ]; } || die "partitions did not appear on $TARGET"
+
+say "FORMATTING"
+mkfs.fat -F32 -n EFI "$ESP" >/dev/null
+mkfs.ext4 -F -q -L galactos "$ROOTP"
+
+# ---- copy the live system ----
+say "COPYING THE SYSTEM (this takes several minutes)"
+mkdir -p "$T"
+mount "$ROOTP" "$T"
+rc=0
+rsync -aAX --info=progress2 --no-inc-recursive \
+    --exclude='/proc/*' --exclude='/sys/*' --exclude='/dev/*' --exclude='/run/*' \
+    --exclude='/tmp/*' --exclude='/mnt/*' --exclude='/lost+found' \
+    --exclude='/home/galactos' --exclude='/etc/fstab' \
+    / "$T/" || rc=$?
+if [ "$rc" -ne 0 ] && [ "$rc" -ne 24 ]; then die "rsync failed (exit code $rc)"; fi
+mkdir -p "$T"/{dev,proc,sys,run,tmp,mnt,boot/efi}
+chmod 1777 "$T/tmp"
+mount "$ESP" "$T/boot/efi"
+
+# older ISOs had no /boot inside the system image
+if ! ls "$T"/boot/vmlinuz-* >/dev/null 2>&1; then
+    say "KERNEL NOT IN THE SYSTEM IMAGE - copying it from the ISO"
+    KVER=$(ls /lib/modules | head -n1)
+    cp /run/live/medium/boot/vmlinuz "$T/boot/vmlinuz-$KVER"
+    cp /run/live/medium/boot/initrd "$T/boot/initrd.img-$KVER"
+    ln -sf "boot/vmlinuz-$KVER" "$T/vmlinuz"
+    ln -sf "boot/initrd.img-$KVER" "$T/initrd.img"
 fi
 
-echo "==========PARTITIONING $TARGET=========="
-fdisk "$TARGET" << EOF
-n
-p
-1
+# ---- identity of this installation ----
+say "WRITING THIS MACHINE'S IDENTITY"
+ROOT_UUID=$(blkid -s UUID -o value "$ROOTP")
+ESP_UUID=$(blkid -s UUID -o value "$ESP")
+cat > "$T/etc/fstab" << FSTAB
+UUID=$ROOT_UUID  /          ext4  errors=remount-ro  0  1
+UUID=$ESP_UUID   /boot/efi  vfat  umask=0077         0  2
+FSTAB
+echo "$NEWHOST" > "$T/etc/hostname"
+printf '127.0.0.1 localhost\n127.0.1.1 %s\n' "$NEWHOST" > "$T/etc/hosts"
+: > "$T/etc/machine-id"
+rm -f "$T"/etc/ssh/ssh_host_* "$T/var/lib/systemd/random-seed"
 
+# ---- chroot ----
+mount --rbind /dev "$T/dev"
+mount --make-rslave "$T/dev"
+mount -t proc proc "$T/proc"
+mount -t sysfs sys "$T/sys"
+export DEBIAN_FRONTEND=noninteractive
 
-a
-w
-EOF
+say "CREATING YOUR ACCOUNT"
+chroot "$T" ssh-keygen -A >/dev/null
+chroot "$T" userdel -rf galactos >/dev/null 2>&1 || true
+chroot "$T" useradd -m -s /bin/bash -G sudo,audio,video "$NEWUSER"
+printf '%s:%s\n' "$NEWUSER" "$PASS1" | chroot "$T" chpasswd
+chroot "$T" passwd -l root >/dev/null
+unset PASS1 PASS2
 
-echo "==========FORMATTING=========="
-mkfs.ext4 "${TARGET}1"
+say "BUILDING THE BOOT FILES"
+chroot "$T" apt-get remove --purge -y live-boot live-boot-initramfs-tools >/dev/null 2>&1 || true
+chroot "$T" update-initramfs -u -k all
 
-echo "==========MOUNTING TARGET=========="
-mkdir -p /mnt/galactos-target
-mount "${TARGET}1" /mnt/galactos-target
+say "INSTALLING THE BOOTLOADER (BIOS + UEFI)"
+if [ -f "$T/etc/default/grub" ]; then
+    sed -i 's/^GRUB_DISTRIBUTOR=.*/GRUB_DISTRIBUTOR="GalactOS"/; s/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="quiet"/' "$T/etc/default/grub"
+fi
+chroot "$T" grub-install --target=i386-pc --recheck "$TARGET"
+chroot "$T" grub-install --target=x86_64-efi --efi-directory=/boot/efi --removable --recheck
+chroot "$T" update-grub
+grep -q vmlinuz "$T/boot/grub/grub.cfg" || die "GRUB found no kernel to boot"
+[ -f "$T/boot/efi/EFI/BOOT/BOOTX64.EFI" ] || die "the UEFI boot file was not created"
 
-echo "==========COPYING LIVE SYSTEM TO DISK=========="
-rsync -aAXv --exclude=/proc --exclude=/sys --exclude=/dev \
-    --exclude=/mnt --exclude=/run --exclude=/tmp \
-    / /mnt/galactos-target/
-echo "rsync exit code: $?"
-
-echo "==========CREATING MISSING MOUNT POINTS=========="
-mkdir -p /mnt/galactos-target/dev /mnt/galactos-target/proc /mnt/galactos-target/sys /mnt/galactos-target/run /mnt/galactos-target/tmp /mnt/galactos-target/mnt
-echo "==========ENSURING KERNEL/INITRD PRESENT=========="
-mkdir -p /mnt/galactos-target/boot
-KVER=$(ls /lib/modules/ | head -n1)
-cp /run/live/medium/boot/vmlinuz "/mnt/galactos-target/boot/vmlinuz-${KVER}"
-cp /run/live/medium/boot/initrd "/mnt/galactos-target/boot/initrd.img-${KVER}"
-ln -sf "boot/vmlinuz-${KVER}" /mnt/galactos-target/vmlinuz
-ln -sf "boot/initrd.img-${KVER}" /mnt/galactos-target/initrd.img
-ls -la /mnt/galactos-target/boot/
-
-echo "==========GENERATING FSTAB=========="
-ROOT_UUID=$(blkid -s UUID -o value "${TARGET}1")
-echo "UUID=${ROOT_UUID}  /  ext4  errors=remount-ro  0  1" > /mnt/galactos-target/etc/fstab
-
-echo "==========INSTALLING BOOTLOADER=========="
-mount --bind /dev /mnt/galactos-target/dev
-mount --bind /proc /mnt/galactos-target/proc
-mount --bind /sys /mnt/galactos-target/sys
-chroot /mnt/galactos-target /bin/bash -c "grub-install ${TARGET} && update-grub"
-
-echo "==========CLEANUP=========="
-umount /mnt/galactos-target/dev
-umount /mnt/galactos-target/proc
-umount /mnt/galactos-target/sys
-umount /mnt/galactos-target
-
+say "FINISHING"
+sync
+umount -R "$T"
+echo
 echo "=========================================="
-echo " Install complete. Remove the ISO and reboot."
+echo " Install complete."
+echo " Remove the ISO/USB, then reboot and log in as $NEWUSER."
 echo "=========================================="
+read -rp "Reboot now? [y/N] " R
+if [[ "$R" =~ ^[Yy]$ ]]; then reboot; fi

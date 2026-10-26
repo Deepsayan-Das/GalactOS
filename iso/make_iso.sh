@@ -59,6 +59,7 @@ if [ -n "$(git status --porcelain . 2>/dev/null || true)" ]; then
     echo "WARNING: uncommitted changes in iso/ (this ISO won't match a saved commit):"
     git status --short . | head -8
 fi
+[ -d /usr/lib/grub/x86_64-efi ] || die "host is missing grub-efi-amd64-bin (run: sudo apt install grub-efi-amd64-bin mtools); the ISO would not boot on UEFI"
 sudo -v
 
 if [ "$RUN_GUI" -eq 1 ]; then

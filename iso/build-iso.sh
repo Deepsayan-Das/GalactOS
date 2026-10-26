@@ -19,7 +19,7 @@ cp grub/grub.cfg "$ISO_STAGING_DIR/boot/grub/grub.cfg"
 
 echo "==========BUILDING SQUASHFS (clean rebuild, avoids silent append bug)=========="
 rm -f "$ISO_STAGING_DIR/live/filesystem.squashfs"
-sudo mksquashfs "$ROOTFS_DIR" "$ISO_STAGING_DIR/live/filesystem.squashfs" -e boot
+sudo mksquashfs "$ROOTFS_DIR" "$ISO_STAGING_DIR/live/filesystem.squashfs"
 
 echo "==========COPYING KERNEL + INITRD=========="
 cp "$ROOTFS_DIR"/boot/vmlinuz-* "$ISO_STAGING_DIR/boot/vmlinuz"
