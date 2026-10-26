@@ -62,3 +62,15 @@ grub2-common
 dosfstools
 gdisk
 efibootmgr
+wpasupplicant
+wireless-regdb
+iw
+rfkill
+firmware-linux
+firmware-iwlwifi
+firmware-realtek
+firmware-atheros
+firmware-brcm80211
+firmware-sof-signed
+intel-microcode
+amd64-microcode
