@@ -59,12 +59,14 @@ fi
 echo "==========LIVE USER (galactos / galactos)=========="
 sudo chroot "$ROOTFS" /bin/bash -c "id galactos >/dev/null 2>&1 || useradd -m -s /bin/bash -G sudo,audio,video galactos"
 echo 'galactos:galactos' | sudo chroot "$ROOTFS" chpasswd
+sudo chroot "$ROOTFS" passwd -l root >/dev/null
 sudo rm -rf "$ROOTFS/home/galactos/.config" "$ROOTFS/home/galactos/.local/share/applications"
 sudo mkdir -p "$ROOTFS/home/galactos/.local/share"
 sudo cp -a "$ROOTFS/etc/skel/.config" "$ROOTFS/home/galactos/.config"
 sudo cp -a "$ROOTFS/etc/skel/.local/share/applications" "$ROOTFS/home/galactos/.local/share/applications"
 sudo chroot "$ROOTFS" chown -R galactos:galactos /home/galactos
 
+sudo chroot "$ROOTFS" systemctl disable ssh ssh.socket >/dev/null 2>&1 || true
 echo "==========CLEANING APT CACHE=========="
 sudo chroot "$ROOTFS" /bin/bash -c "apt clean && rm -rf /var/lib/apt/lists/*"
 
