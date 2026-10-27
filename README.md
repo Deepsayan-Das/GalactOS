@@ -1,3 +1,5 @@
+[![CI](https://github.com/Deepsayan-Das/GalactOS/actions/workflows/ci.yml/badge.svg)](https://github.com/Deepsayan-Das/GalactOS/actions/workflows/ci.yml)
+
 # GalactOS
 
 A developer-first, Debian-based Linux distribution, built from scratch via

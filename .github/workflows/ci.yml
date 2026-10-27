@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  scripts:
+    name: Scripts
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check syntax (bash -n) and run ShellCheck
+        run: |
+          files=$(git ls-files '*.sh')
+          all_files=()
+          for f in $files iso/installer/galactos-install; do
+            all_files+=("$f")
+          done
+
+          echo "=== Checking syntax with bash -n ==="
+          for file in "${all_files[@]}"; do
+            echo "Checking $file"
+            bash -n "$file"
+          done
+
+          echo "=== Running shellcheck (severity: error) ==="
+          shellcheck --severity=error "${all_files[@]}"
+
+  hygiene:
+    name: Hygiene
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check forbidden files and extensions
+        run: |
+          echo "Checking for disallowed files in git ls-files..."
+          forbidden=$(git ls-files | grep -E '\.(iso|deb|img|squashfs)$|^iso/live-rootfs/' || true)
+          if [ -n "$forbidden" ]; then
+            echo "ERROR: Disallowed files tracked in git:" >&2
+            echo "$forbidden" >&2
+            exit 1
+          fi
+
+      - name: Check file sizes (max 5 MB)
+        run: |
+          echo "Checking for tracked files exceeding 5 MB..."
+          oversized=0
+          while IFS= read -r file; do
+            if [ -f "$file" ]; then
+              size=$(wc -c < "$file")
+              if [ "$size" -gt 5242880 ]; then
+                echo "ERROR: File $file exceeds 5 MB ($size bytes)" >&2
+                oversized=1
+              fi
+            fi
+          done < <(git ls-files)
+          if [ "$oversized" -ne 0 ]; then
+            exit 1
+          fi
+
+      - name: Check for key-like strings
+        run: |
+          echo "Checking for key-like strings in repository..."
+          KEY_PATTERN='sk-[A-Za-z0-9_-]{20}|AIzaSy[A-Za-z0-9_-]{30}|gsk_[A-Za-z0-9_-]{20}|hf_[A-Za-z0-9_-]{20}'
+          if git grep -E -I "$KEY_PATTERN" -- ':!.github/workflows/*'; then
+            echo "ERROR: Key-like string found in repository file content" >&2
+            exit 1
+          fi
+          if git ls-files | grep -E "$KEY_PATTERN"; then
+            echo "ERROR: Key-like string found in repository file name" >&2
+            exit 1
+          fi
+
+  packaging:
+    name: Packaging
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate packaging scripts and control file
+        run: |
+          echo "=== Validating orbit packaging scripts with sh -n ==="
+          sh -n iso/packaging/orbit/orbit
+          sh -n iso/packaging/orbit/orbit-configure
+
+          echo "=== Checking control file required fields ==="
+          CONTROL="iso/packaging/orbit/control"
+          for field in Package Version Depends Maintainer; do
+            if ! grep -q "^$field:" "$CONTROL"; then
+              echo "ERROR: Required field '$field' missing in $CONTROL" >&2
+              exit 1
+            fi
+            echo "OK: Found field $field"
+          done
