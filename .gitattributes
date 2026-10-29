@@ -1,2 +1,10 @@
+* text=auto eol=lf
 *.sh text eol=lf
 iso/installer/galactos-install text eol=lf
+iso/packaging/orbit/orbit text eol=lf
+iso/packaging/orbit/orbit-configure text eol=lf
+iso/gui/assets/orbit/orbit-launch text eol=lf
+iso/gui/assets/autostart text eol=lf
+*.png binary
+*.jpg binary
+*.webp binary
