@@ -2,130 +2,212 @@
 
 # GalactOS
 
-A developer-first, Debian-based Linux distribution, built from scratch via
-a documented, reproducible pipeline — not a repack of an existing distro.
+A developer-first, Debian-based Linux distribution built from scratch via a documented, reproducible pipeline — not a repack of an existing distribution.
 
-GalactOS ships [`nova`](https://github.com/Deepsayan-Das/nova), a custom
-CLI for project/environment/container management, installed via a real,
-GPG-signed apt repository rather than bundled as a binary.
+GalactOS boots into a custom, lightweight Openbox desktop environment powered by modern developer utilities, including [`nova`](https://github.com/Deepsayan-Das/nova) (container, Kubernetes, and project management CLI) and `orbit` (local AI coding assistant), installed through a real, GPG-signed APT repository rather than bundled ad-hoc binaries.
 
-## What's in this repo
+---
 
-```
-build.sh              # Builds a complete, installed GalactOS disk image (.img)
-iso/
-  build-rootfs.sh       # Builds a branded, packaged rootfs (shared by build.sh's
-                         # logic and the live ISO)
-  build-gui.sh          # Installs and configures Openbox desktop GUI on a rootfs
-  build-iso.sh           # Packages a rootfs into a bootable live ISO
-  grub/
-    grub.cfg               # Live-boot GRUB configuration
-  installer/
-    galactos-install        # Installer script bundled into the live ISO;
-                             # partitions a target disk and installs GalactOS onto it
-```
+## Screenshots
 
-## Option 1 — Build a disk image directly (`.img`)
+<!-- Screenshot placeholders: images located in docs/img/ -->
+![GalactOS Desktop](docs/img/desktop.png)
+*GalactOS Openbox desktop session with Polybar, Tint2, and Alacritty*
 
-For quick local testing in QEMU without a live/install flow:
+![GalactOS Web Greeter](docs/img/login.png)
+*Web-Greeter HTML/JS login screen with GalactOS branding*
 
-```bash
-chmod +x build.sh
-./build.sh
-```
+![GalactOS Installer](docs/img/installer.png)
+*Whole-disk CLI installer running in terminal*
 
-Produces `galactos.img` — a complete, already-installed GalactOS disk,
-bootable directly in QEMU:
+---
 
-```bash
-qemu-system-x86_64 -hda galactos.img -m 2048
-```
+## Features
 
-## Option 2 — Build a bootable live ISO + installer (VirtualBox)
+- **Debian Stable Minbase Foundation**: Bootstrapped directly from official Debian repositories (`deb.debian.org`) using `debootstrap --variant=minbase`, maintaining full compatibility with Debian package archives.
+- **Custom OS Identity**: Branded system identity (`GalactOS Ignition (beta-v1.0)` / `GalactOS GNU/Linux`) configured in `/etc/os-release` and `/etc/issue`.
+- **Integrated Developer Tooling**:
+  - [`nova`](https://github.com/Deepsayan-Das/nova): Project scaffolding, system diagnostics, and container engine management.
+  - `orbit`: AI coding assistant with CLI launcher (`/usr/bin/orbit`, `/usr/local/bin/orbit-launch`).
+  - Dedicated APT repository (`https://deepsayan-das.github.io/nova`) with GPG verification keyring (`/etc/apt/keyrings/galactos.gpg`).
+- **Baseline Developer Packages**: `git`, `curl`, `wget`, `vim`, `make`, `build-essential`, `sudo`, `ssh`, `ca-certificates`, `fdisk`, `e2fsprogs`, and `rsync`.
+- **Modern CLI Stack** (`packages-extra.txt`): `fish`, `tmux`, `fzf`, `ripgrep`, `fd` (`fd-find`), `bat` (`batcat`), `jq`, `htop`, `btop`, `tree`, `bash-completion`.
+- **Pre-installed Runtimes & Toolchains**: `python3-pip`, `python3-venv`, `pipx`, `cmake`, `gdb`, `shellcheck`, `sqlite3`, `gh`, `git-lfs`, `nodejs`, `npm`, `golang-go`, `podman`, `podman-compose`.
+- **Lightweight Openbox Desktop**:
+  - Openbox window manager configured with the `GalactOS-Dark` theme and custom monochrome XBM control buttons.
+  - LightDM display manager paired with Web-Greeter 4.0.0 running a custom HTML/CSS/JavaScript theme.
+  - Picom compositor for transparency, smooth shadows, and tear-free rendering.
+  - Dual bar setup: Polybar top status bar and Tint2 bottom taskbar dock.
+  - Rofi launcher (`Super+Space`) and sidebar system monitor (`rofi/sidebar.sh`).
+  - GPU-accelerated Alacritty terminal emulator configured with JetBrains Mono font.
+  - Productivity suite: Firefox ESR, PCManFM, Gedit, LibreOffice (Writer, Calc, Impress), Atril, Ristretto, Xarchiver, Galculator, MPV, Dunst, and LXPolKit.
+- **Hybrid BIOS & UEFI Support**: The live ISO and the installed target system boot interchangeably on both legacy BIOS and 64-bit UEFI firmware.
 
-This produces a real `.iso`: boot it, and it runs a temporary live
-environment from which you can install GalactOS onto a real (virtual)
-disk — the same two-stage flow real distro installers use.
+---
+
+## Installation Guide
+
+GalactOS provides an interactive CLI installer bundled directly into the live ISO.
+
+### System Requirements
+- **CPU**: 64-bit x86-64 processor.
+- **Memory**: Minimum 2048 MB (2 GB) RAM.
+- **Storage**: Minimum 12 GB storage drive (the installer validates `blockdev --getsize64 >= 12000000000` bytes).
+- **Firmware**: Legacy BIOS or UEFI (**Secure Boot must be disabled in firmware**).
+
+### 1. Write the USB Medium
+Write the downloaded ISO file (`galactos-gui-v*.iso`) to a USB flash drive using either:
+- **Rufus (Windows)**: When prompted, you **must select DD Image mode** (ISO Image mode may not preserve hybrid GRUB partition structures).
+- **balenaEtcher (Windows/macOS/Linux)**: Flash the ISO directly to the target USB drive.
+
+### 2. Configure Host Firmware
+- **Disable Secure Boot**: The GalactOS ISO uses an unsigned GRUB bootloader without Microsoft UEFI Secure Boot signing keys. You must disable Secure Boot in your motherboard's UEFI/BIOS settings.
+- Select the USB drive from your system boot menu.
+
+### 3. Boot the Live Environment
+1. At the GRUB menu, select **GalactOS Live** (or the debug entry if diagnosing boot issues).
+2. The Web-Greeter login screen will appear. Log in using the default live credentials:
+   - **Username**: `galactos`
+   - **Password**: `galactos`
+
+### 4. Launch the Installer
+1. Open a terminal (press `Ctrl + Alt + T` or launch Alacritty from the menu).
+2. Start the installer script with root privileges:
+   ```bash
+   sudo galactos-install
+   ```
+3. **Follow the interactive prompts**:
+   - **Target Disk Selection**: Choose the destination disk number from the list. (The installer automatically excludes the live USB source drive).
+   - **Confirmation**: Type the exact disk device name (e.g. `sda` or `nvme0n1`) to confirm. **All existing partitions and data on this disk will be permanently erased.**
+   - **Computer Name**: Enter a hostname (default: `galactos`).
+   - **User Account**: Enter your desired username (cannot be `root`) and set a password.
+4. The installer will partition the disk (GPT), format the filesystems (FAT32 EFI and ext4 root), copy the system with `rsync`, generate machine UUIDs and `/etc/fstab`, create your user account, lock the root password, and install GRUB for both BIOS and UEFI.
+
+### 5. First Boot
+1. Once the installer prints `"Install complete."`, choose `y` to reboot (or power off manually).
+2. **Remove the USB drive** (or detach the ISO from your virtual machine's optical drive).
+3. Power on the system: GalactOS will boot directly from your hard disk. Log in with the username and password created during installation.
+
+---
+
+## Building from Source
+
+To build a fresh release ISO from source:
 
 ### Prerequisites
-
+On a Debian or Ubuntu 64-bit host system:
 ```bash
 sudo apt update
 sudo apt install -y debootstrap xorriso squashfs-tools \
-    grub-pc-bin grub-efi-amd64-bin mtools
+    grub-pc-bin grub-efi-amd64-bin mtools dosfstools curl wget rsync git
 ```
 
-### Build
+### Build with `make_iso.sh`
+The primary build orchestrator is `iso/make_iso.sh`:
 
 ```bash
 cd iso
 
-# 1. Build the rootfs (installs base packages, Nova, and Openbox GUI environment)
-chmod +x build-rootfs.sh build-gui.sh
-./build-rootfs.sh live-rootfs
-
-# 2. Add the installer script into the rootfs
-sudo mkdir -p live-rootfs/usr/local/bin
-sudo cp installer/galactos-install live-rootfs/usr/local/bin/galactos-install
-sudo chmod +x live-rootfs/usr/local/bin/galactos-install
-
-# 3. Build the ISO
-chmod +x build-iso.sh
-./build-iso.sh live-rootfs iso galactos-live.iso
+# Build an ISO with a specified version number (e.g. version 26)
+./make_iso.sh 26
 ```
 
-This produces `iso/galactos-live.iso`.
+This will:
+1. Perform pre-flight safety checks (free space, mount validation, UEFI tooling).
+2. Refresh the GUI layer (`build-gui.sh`) and system configuration layer (`build-system.sh`).
+3. Bundle `installer/galactos-install` into `/usr/local/bin/galactos-install`.
+4. Validate rootfs integrity.
+5. Compress the rootfs into SquashFS and package `galactos-gui-v26.iso` using `grub-mkrescue`.
+6. Copy the output ISO to the destination path (defaults to `/mnt/d/vbox-gui-iso`, or overridden via the `ISO_DEST` environment variable) and verify SHA256 checksums.
 
-### Boot and install (VirtualBox)
+For full build flags, individual layer documentation, and standalone QEMU disk image building (`build.sh`), refer to [`docs/BUILD.md`](docs/BUILD.md).
 
-1. Create a VM: Linux, Debian 64-bit, **≥2048MB RAM**, a virtual hard disk
-   (10-15GB is enough for a minimal install).
-2. Attach `galactos-live.iso` as the optical drive.
-3. Boot. At the GRUB menu, select **GalactOS Live**.
-4. Log in as `root` with the password set during `build-rootfs.sh`.
-5. **If the target disk has been used before** (e.g. a previous install
-   attempt), wipe it first: `wipefs -a /dev/sda`.
-6. Run the installer:
-   ```bash
-   galactos-install
-   ```
-   Follow the prompts — it will ask for the target disk name (e.g. `sda`,
-   not `/dev/sda`) and a final `yes` confirmation before erasing it.
-7. Once it prints "Install complete," power off the VM, **detach the ISO**
-   from the optical drive, and boot again — GalactOS now boots directly
-   from the virtual hard disk, independent of the ISO.
+---
 
-### Rebuilding after a change
+## Repository Layout
 
-If you edit `galactos-install`, you only need to re-copy it into the
-rootfs and re-run `build-iso.sh` — no need to rebuild the whole rootfs
-from scratch:
-
-```bash
-sudo cp installer/galactos-install live-rootfs/usr/local/bin/galactos-install
-sudo chmod +x live-rootfs/usr/local/bin/galactos-install
-./build-iso.sh live-rootfs iso galactos-live.iso
+```
+.
+├── .github/
+│   └── workflows/
+│       └── ci.yml             # GitHub Actions CI workflow (scripts, hygiene, packaging)
+├── .gitattributes             # Forces LF line endings on *.sh and installer
+├── .gitignore
+├── CHANGELOG.md               # Version history and release notes
+├── README.md                  # Project overview and quickstart
+├── build.sh                   # Standalone legacy builder: directly creates galactos.img (QEMU)
+├── docs/
+│   ├── BUILD.md               # Comprehensive build documentation
+│   ├── INSTALLER.md           # Technical installer and partitioning reference
+│   ├── LEARNING-GUI.md        # Plain-language explanation of the Openbox desktop stack
+│   ├── LEARNING-INSTALLER.md  # Plain-language explanation of live-to-disk installation
+│   └── img/                   # Documentation screenshots
+└── iso/
+    ├── build-gui.sh           # Installs Openbox, Web-Greeter, Polybar, Alacritty, themes
+    ├── build-iso.sh           # Packages rootfs into bootable hybrid live ISO (mksquashfs, GRUB)
+    ├── build-rootfs.sh        # Bootstraps Debian base rootfs, Nova & Orbit repos, kernel
+    ├── build-system.sh        # Installs packages-extra.txt, locales, /etc/skel, live user
+    ├── make_iso.sh            # Automated ISO build orchestrator with verification
+    ├── grub/
+    │   └── grub.cfg           # Live ISO GRUB boot menu configuration
+    ├── gui/
+    │   ├── assets/            # Configs (openbox, polybar, tint2, picom, rofi, keybinds, icons)
+    │   ├── greeter-theme/     # Web-Greeter custom HTML/CSS/JavaScript theme
+    │   └── packages-extra.txt # List of CLI and GUI desktop packages
+    ├── installer/
+    │   └── galactos-install   # Live system-to-disk interactive installer script
+    └── packaging/
+        └── orbit/
+            ├── build-orbit-deb.sh # Debian packaging script for Orbit
+            ├── control            # Debian package control metadata
+            ├── orbit              # Orbit CLI runner wrapper
+            └── orbit-configure    # Orbit initial setup wrapper
 ```
 
-## Architecture notes
+---
 
-- **Universal baseline packages only** ship in the base image (git, curl,
-  wget, vim, nano, build-essential, sudo, ssh, ca-certificates, fdisk,
-  e2fsprogs, rsync, nova). Stack-specific tooling (Python, Node, Go, etc.)
-  is intentionally left out — install via `nova install` instead.
-- **`nova` is installed via a real apt repository**
-  (`deepsayan-das.github.io/nova`), GPG-signed, the same way an end user
-  installs it — not copied in as a special-cased binary.
-- The live ISO's rootfs and the installed-image rootfs share the same
-  `build-rootfs.sh`, so branding and package selection never drift between
-  the two.
-- Live-boot kernel/initrd are served from the ISO's own boot media
-  (`/run/live/medium/boot/` at runtime) rather than baked into the
-  compressed `filesystem.squashfs` — the installer explicitly copies them
-  from there onto the target disk during install.
+## Known Issues
 
-## Status
+- **No Sound in Virtual Machines**: Audio daemons (`pipewire`, `wireplumber`, `alsa-utils`) are pre-installed, but virtual sound devices in VirtualBox or QEMU may not automatically map to the host audio output without manual configuration.
+- **Unsigned ISO**: The live ISO does not include Microsoft Secure Boot signatures. UEFI Secure Boot must be disabled in system firmware to boot the ISO.
+- **Whole-Disk Installation Only**: The installer executes `wipefs -af` and `sgdisk --zap-all` on the target drive. It does not support manual partitioning, resizing existing partitions, or dual-booting with other operating systems.
+- **No Swap Space Configured**: The installer provisions only EFI and ext4 root partitions. It does not create a swap partition or a swapfile. Swapfiles can be configured manually post-installation if required.
+- **UTC Timezone Default**: The installer does not feature an interactive timezone selection prompt; the system clock defaults to UTC. Timezone can be adjusted after installation using `timedatectl`.
+- **No Disk Encryption**: The installer formats the root partition as plain ext4 without LUKS full-disk encryption support.
 
-Live boot and VM-targeted install (VirtualBox) are working end-to-end.
-Bare-metal installation support is a separate, not-yet-started effort —
-this installer is scoped to VM disks only for now.
+---
+
+## Architecture Notes: `build.sh` vs `iso/build-rootfs.sh`
+
+> [!NOTE]
+> `build.sh` and `iso/build-rootfs.sh` are **independent scripts**:
+> - `build.sh` is an autonomous script that bootstraps a minimal Debian system directly into a raw 2 GB disk image (`galactos.img`) partitioned with MBR for fast local QEMU testing.
+> - `iso/build-rootfs.sh` is part of the modular ISO pipeline in `iso/`. It builds the full, branded rootfs (`live-rootfs`) containing the desktop GUI, extended developer packages, live-boot support, and installer scripts.
+>
+> `build.sh` does **not** call or share `iso/build-rootfs.sh`.
+
+---
+
+## Third-Party Credits & Acknowledgments
+
+GalactOS builds upon exceptional open-source software:
+- [Debian GNU/Linux](https://www.debian.org/): Upstream base distribution and package repositories.
+- [Openbox](http://openbox.org/): Ultra-lightweight, customizable X11 window manager.
+- [Web-Greeter](https://github.com/JezerM/web-greeter) by JezerM: HTML/CSS/JS greeter for LightDM.
+- [LightDM](https://github.com/canonical/lightdm): Cross-desktop display manager.
+- [Picom](https://github.com/yshui/picom): Lightweight X11 compositor.
+- [Polybar](https://github.com/polybar/polybar): Fast, customizable status bar.
+- [Tint2](https://gitlab.com/o9000/tint2): Lightweight panel and taskbar.
+- [Rofi](https://github.com/davatorium/rofi): Window switcher, application launcher, and dmenu replacement.
+- [Alacritty](https://github.com/alacritty/alacritty): Fast, GPU-accelerated terminal emulator.
+- [Arc Theme](https://github.com/horst3180/arc-theme) & [Papirus Icon Theme](https://github.com/PapirusDevelopmentTeam/papirus-icon-theme): Visual styling.
+- [JetBrains Mono](https://www.jetbrains.com/lp/mono/), [Inter](https://rsms.me/inter/), and [Font Awesome](https://fontawesome.com/): Desktop typography and iconography.
+- [`nova`](https://github.com/Deepsayan-Das/nova) & Orbit: Developer CLI tools by Deepsayan Das.
+
+---
+
+## License
+
+GalactOS is open-source software licensed under the [MIT License](LICENSE). Copyright &copy; 2026 Deepsayan Das.
+
+The live and installed system images bundle third-party software and upstream Debian packages under their own respective open-source licenses (such as GPL, LGPL, BSD, Apache, and MIT). Pre-installed third-party software retains its original copyright and license terms.

@@ -7,7 +7,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-DEST="/mnt/d/vbox-gui-iso"
+DEST="${ISO_DEST:-/mnt/d/vbox-gui-iso}"
 ROOTFS="live-rootfs"
 RUN_GUI=1
 FORCE=0

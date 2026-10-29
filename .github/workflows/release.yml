@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract release notes from CHANGELOG.md
+        run: |
+          python3 - << 'EOF'
+          import os, sys, re
+
+          tag = os.environ.get("GITHUB_REF_NAME", "")
+          version = tag[1:] if tag.startswith("v") else tag
+
+          if not os.path.exists("CHANGELOG.md"):
+              sys.stderr.write("ERROR: CHANGELOG.md not found in repository root.\n")
+              sys.exit(1)
+
+          with open("CHANGELOG.md", "r", encoding="utf-8") as f:
+              text = f.read()
+
+          # Match ## [1.0.0], ## 1.0.0, ## [v1.0.0], or ## v1.0.0 (with optional trailing date/text)
+          pattern = rf'^##\s+\[?v?{re.escape(version)}(?:\]|\s+|-|$)(?:[^\n]*)?\n(.*?)(?=\n##\s+|\Z)'
+          match = re.search(pattern, text, re.MULTILINE | re.DOTALL)
+
+          if not match or not match.group(1).strip():
+              sys.stderr.write(f"ERROR: No changelog section found in CHANGELOG.md matching tag '{tag}' (version '{version}').\n")
+              sys.exit(1)
+
+          body = match.group(1).strip()
+          with open("RELEASE_BODY.md", "w", encoding="utf-8") as f:
+              f.write(body + "\n")
+
+          print(f"Successfully extracted release notes for tag '{tag}':")
+          print("=" * 40)
+          print(body)
+          print("=" * 40)
+          EOF
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: RELEASE_BODY.md
