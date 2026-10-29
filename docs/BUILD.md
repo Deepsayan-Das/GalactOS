@@ -166,7 +166,7 @@ chmod +x build.sh
 1. Installs `debootstrap` on the host.
 2. Bootstraps Debian stable into `./rootfs`.
 3. Installs baseline packages (`git`, `curl`, `wget`, `vim`, `nano`, `make`, `build-essential`, `sudo`, `ssh`, `ca-certificates`).
-4. Sets OS identity to `GalactOS Ignition (beta-v1.0)` in `/etc/os-release` and `/etc/issue`.
+4. Sets OS identity to `GalactOS 1.0 (Ignition)` in `/etc/os-release` and `/etc/issue`.
 5. Creates a 2 GB raw image file: `galactos.img`.
 6. Partitions the image with MBR (single bootable ext4 partition).
 7. Sets up loopback device (`losetup`), formats ext4, mounts at `/mnt/galactos`.

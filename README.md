@@ -25,7 +25,7 @@ GalactOS boots into a custom, lightweight Openbox desktop environment powered by
 ## Features
 
 - **Debian Stable Minbase Foundation**: Bootstrapped directly from official Debian repositories (`deb.debian.org`) using `debootstrap --variant=minbase`, maintaining full compatibility with Debian package archives.
-- **Custom OS Identity**: Branded system identity (`GalactOS Ignition (beta-v1.0)` / `GalactOS GNU/Linux`) configured in `/etc/os-release` and `/etc/issue`.
+- **Custom OS Identity**: Branded system identity (`GalactOS 1.0 (Ignition)` / `GalactOS GNU/Linux`) configured in `/etc/os-release` and `/etc/issue`.
 - **Integrated Developer Tooling**:
   - [`nova`](https://github.com/Deepsayan-Das/nova): Project scaffolding, system diagnostics, and container engine management.
   - `orbit`: AI coding assistant with CLI launcher (`/usr/bin/orbit`, `/usr/local/bin/orbit-launch`).
@@ -38,7 +38,7 @@ GalactOS boots into a custom, lightweight Openbox desktop environment powered by
   - LightDM display manager paired with Web-Greeter 4.0.0 running a custom HTML/CSS/JavaScript theme.
   - Picom compositor for transparency, smooth shadows, and tear-free rendering.
   - Dual bar setup: Polybar top status bar and Tint2 bottom taskbar dock.
-  - Rofi launcher (`Super+Space`) and sidebar system monitor (`rofi/sidebar.sh`).
+  - Rofi launcher (`Super+Space`) and sidebar panel (date, battery, volume, app shortcuts, power menu) (`rofi/sidebar.sh`).
   - GPU-accelerated Alacritty terminal emulator configured with JetBrains Mono font.
   - Productivity suite: Firefox ESR, PCManFM, Gedit, LibreOffice (Writer, Calc, Impress), Atril, Ristretto, Xarchiver, Galculator, MPV, Dunst, and LXPolKit.
 - **Hybrid BIOS & UEFI Support**: The live ISO and the installed target system boot interchangeably on both legacy BIOS and 64-bit UEFI firmware.

@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Base Distribution & Scaffolding**:
   - Debian stable (`minbase`) scaffolding via `debootstrap` with official Debian repositories (`deb.debian.org`).
-  - Branded OS release identification (`GalactOS Ignition (beta-v1.0)` / `GalactOS GNU/Linux`) in `/etc/os-release` and `/etc/issue`.
+  - Branded OS release identification (`GalactOS 1.0 (Ignition)` / `GalactOS GNU/Linux`) in `/etc/os-release` and `/etc/issue`.
   - Linux amd64 kernel (`linux-image-amd64`) and `systemd-sysv` init system.
 - **Developer Tooling & Baseline Packages**:
   - Out-of-the-box installation of the `nova` CLI and `orbit` AI coding assistant via dedicated GPG-signed APT repository (`https://deepsayan-das.github.io/nova`).

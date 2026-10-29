@@ -39,12 +39,12 @@ sudo chroot "$ROOTFS_DIR" /bin/bash -c "
 "
 
 echo "==========CONFIGURING OS_RELEASE=========="
-sudo sed -i 's/^PRETTY_NAME=.*/PRETTY_NAME="GalactOS Ignition (beta-v1.0)"/' "$ROOTFS_DIR/etc/os-release"
+sudo sed -i 's/^PRETTY_NAME=.*/PRETTY_NAME="GalactOS 1.0 (Ignition)"/' "$ROOTFS_DIR/etc/os-release"
 sudo sed -i 's|^NAME=.*|NAME="GalactOS GNU/Linux"|' "$ROOTFS_DIR/etc/os-release"
 echo 'ID_LIKE=debian' | sudo tee -a "$ROOTFS_DIR/etc/os-release" > /dev/null
 
 echo "==========SETTING LOGIN BANNER=========="
-echo -e "GalactOS Ignition (beta-v1.0) \n \l" | sudo tee "$ROOTFS_DIR/etc/issue" > /dev/null
+echo -e "GalactOS 1.0 (Ignition) \n \l" | sudo tee "$ROOTFS_DIR/etc/issue" > /dev/null
 
 echo "==========INSTALLING KERNEL + LIVE-BOOT SUPPORT=========="
 sudo chroot "$ROOTFS_DIR" /bin/bash -c "apt install -y linux-image-amd64 live-boot systemd-sysv grub-pc-bin grub-efi-amd64-bin grub2-common"

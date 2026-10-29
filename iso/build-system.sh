@@ -67,6 +67,10 @@ sudo cp -a "$ROOTFS/etc/skel/.local/share/applications" "$ROOTFS/home/galactos/.
 sudo chroot "$ROOTFS" chown -R galactos:galactos /home/galactos
 
 sudo chroot "$ROOTFS" systemctl disable ssh ssh.socket >/dev/null 2>&1 || true
+echo "==========OS IDENTITY=========="
+sudo sed -i --follow-symlinks 's/^PRETTY_NAME=.*/PRETTY_NAME="GalactOS 1.0 (Ignition)"/' "$ROOTFS/etc/os-release"
+sudo sed -i --follow-symlinks 's|^NAME=.*|NAME="GalactOS GNU/Linux"|' "$ROOTFS/etc/os-release"
+printf 'GalactOS 1.0 (Ignition) \\n \\l\n' | sudo tee "$ROOTFS/etc/issue" > /dev/null
 echo "==========CLEANING APT CACHE=========="
 sudo chroot "$ROOTFS" /bin/bash -c "apt clean && rm -rf /var/lib/apt/lists/*"
 
