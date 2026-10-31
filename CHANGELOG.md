@@ -42,3 +42,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Continuous Integration (CI)**:
   - GitHub Actions CI workflow (`.github/workflows/ci.yml`) targeting Ubuntu 24.04 runners.
   - Three automated validation jobs: shell script syntax verification (`bash -n` and `shellcheck --severity=error`), repository hygiene enforcement (blocking binary artifacts, oversized files >5 MB, and API key patterns), and Debian packaging checks (`sh -n` and `control` file validation).
+
+### Download
+
+- The release ISO is distributed as three 7-Zip split parts attached to the [GitHub Release page](https://github.com/Deepsayan-Das/GalactOS/releases/tag/v1.0.0):
+  - `galactos-1.0.0-amd64.iso.7z.001` (~1 GB)
+  - `galactos-1.0.0-amd64.iso.7z.002` (~1 GB)
+  - `galactos-1.0.0-amd64.iso.7z.003` (~1 GB)
+  - `SHA256SUMS.txt` — SHA-256 checksums for the three archive parts.
+- **Upload in progress**: parts are not yet attached to the release; until complete, build from source with `./iso/make_iso.sh`.
+- To verify the parts on Windows: `Get-FileHash <file> -Algorithm SHA256`; on Linux: `sha256sum -c SHA256SUMS.txt`.
+- To extract on Windows, open `galactos-1.0.0-amd64.iso.7z.001` with 7-Zip; on Linux: `7z x galactos-1.0.0-amd64.iso.7z.001` (package `p7zip-full`).
+- SHA-256 of the extracted ISO: `942af2aac67a379ad363fd684c4a668739b503a1bc9c21f61b90129731fd87eb`.

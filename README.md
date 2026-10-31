@@ -90,6 +90,72 @@ Write the downloaded ISO file (`galactos-gui-v*.iso`) to a USB flash drive using
 
 ---
 
+## Download
+
+> [!IMPORTANT]
+> The ISO upload to the GitHub Release page is currently **in progress**. Once complete, three 7-Zip split parts will be attached to the [**GalactOS 1.0.0 Release**](https://github.com/Deepsayan-Das/GalactOS/releases/tag/v1.0.0), together with `SHA256SUMS.txt` for integrity verification. Until then, please [build from source](#building-from-source).
+
+### Files
+
+| File | Size (approx.) |
+|------|----------------|
+| `galactos-1.0.0-amd64.iso.7z.001` | ~1 GB |
+| `galactos-1.0.0-amd64.iso.7z.002` | ~1 GB |
+| `galactos-1.0.0-amd64.iso.7z.003` | ~1 GB |
+| `SHA256SUMS.txt` | — |
+
+### Step 1 — Download
+
+Download all three `.7z.00*` parts **and** `SHA256SUMS.txt` from the [Releases page](https://github.com/Deepsayan-Das/GalactOS/releases/tag/v1.0.0) into the **same folder**.
+
+### Step 2 — Verify the Parts
+
+**Windows (PowerShell):**
+```powershell
+Get-FileHash galactos-1.0.0-amd64.iso.7z.001 -Algorithm SHA256
+Get-FileHash galactos-1.0.0-amd64.iso.7z.002 -Algorithm SHA256
+Get-FileHash galactos-1.0.0-amd64.iso.7z.003 -Algorithm SHA256
+```
+Compare each hash against the corresponding entry in `SHA256SUMS.txt`.
+
+**Linux:**
+```bash
+sha256sum -c SHA256SUMS.txt
+```
+
+### Step 3 — Extract the ISO
+
+**Windows** — open `galactos-1.0.0-amd64.iso.7z.001` with [7-Zip](https://www.7-zip.org/); it will automatically locate the remaining parts and extract the ISO.
+
+**Linux** — install `p7zip-full` and run:
+```bash
+7z x galactos-1.0.0-amd64.iso.7z.001
+```
+7-Zip will join and extract all parts automatically.
+
+### Step 4 — Verify the Extracted ISO
+
+After extraction, verify the resulting `.iso` file:
+
+**Windows (PowerShell):**
+```powershell
+Get-FileHash galactos-1.0.0-amd64.iso -Algorithm SHA256
+```
+
+**Linux:**
+```bash
+sha256sum galactos-1.0.0-amd64.iso
+```
+
+Expected SHA-256:
+```
+942af2aac67a379ad363fd684c4a668739b503a1bc9c21f61b90129731fd87eb
+```
+
+Proceed to the [Installation Guide](#installation-guide) once the ISO is verified.
+
+---
+
 ## Building from Source
 
 To build a fresh release ISO from source:
